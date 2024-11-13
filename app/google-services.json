@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1071731306332",
+    "project_id": "pit-stop-frenzy",
+    "storage_bucket": "pit-stop-frenzy.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1071731306332:android:f518f944149b5883449b99",
+        "android_client_info": {
+          "package_name": "com.example.pitstopfrenzy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlCrMmPMlhbldqAReMIR69uMVO0i13FwU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
