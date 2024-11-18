@@ -34,7 +34,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.util.Objects;
 /** @noinspection CallToPrintStackTrace*/
-public class LogIn extends AppCompatActivity {
+public class LogInActivity extends AppCompatActivity {
     FirebaseAuth auth;
     GoogleSignInClient googleSignInClient;
     ShapeableImageView imageView;
@@ -50,16 +50,16 @@ public class LogIn extends AppCompatActivity {
                     auth.signInWithCredential(authCredential).addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             auth = FirebaseAuth.getInstance();
-                            Glide.with(LogIn.this).load(Objects.requireNonNull(auth.getCurrentUser()).getPhotoUrl()).into(imageView);
+                            Glide.with(LogInActivity.this).load(Objects.requireNonNull(auth.getCurrentUser()).getPhotoUrl()).into(imageView);
                             name.setText(auth.getCurrentUser().getDisplayName());
                             mail.setText(auth.getCurrentUser().getEmail());
-                            Toast.makeText(LogIn.this, "Sign in successfully!", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(LogIn.this, MainActivity.class);
+                            Toast.makeText(LogInActivity.this, "Sign in successfully!", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(LogInActivity.this, MainActivity.class);
                             intent.putExtra("USERNAME", auth.getCurrentUser().getDisplayName());
 
                             startActivity(intent);
                         } else {
-                            Toast.makeText(LogIn.this, "Failed to sign in: " + task.getException(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LogInActivity.this, "Failed to sign in: " + task.getException(), Toast.LENGTH_SHORT).show();
                         }
                     });
                 } catch (ApiException e) {
@@ -81,7 +81,7 @@ public class LogIn extends AppCompatActivity {
         mail = findViewById(R.id.mailTV);
 
         GoogleSignInOptions options = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(getString(R.string.client_id)).requestEmail().build() ;
-        googleSignInClient = GoogleSignIn.getClient(LogIn.this,options);
+        googleSignInClient = GoogleSignIn.getClient(LogInActivity.this,options);
         auth = FirebaseAuth.getInstance() ;
         SignInButton signInButton = findViewById(R.id.signIn) ;
         signInButton.setOnClickListener(view -> {
