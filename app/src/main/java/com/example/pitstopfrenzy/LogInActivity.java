@@ -35,57 +35,83 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import java.util.Objects;
 /** @noinspection CallToPrintStackTrace*/
 public class LogInActivity extends AppCompatActivity {
-    FirebaseAuth auth;
-    GoogleSignInClient googleSignInClient;
-    ShapeableImageView imageView;
-    TextView name, mail;
-    private final ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-        @Override
-        public void onActivityResult(ActivityResult result) {
-            if (result.getResultCode() == RESULT_OK) {
-                Task<GoogleSignInAccount> accountTask = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
-                try {
-                    GoogleSignInAccount signInAccount = accountTask.getResult(ApiException.class);
-                    AuthCredential authCredential = GoogleAuthProvider.getCredential(signInAccount.getIdToken(), null);
-                    auth.signInWithCredential(authCredential).addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            auth = FirebaseAuth.getInstance();
-                            Glide.with(LogInActivity.this).load(Objects.requireNonNull(auth.getCurrentUser()).getPhotoUrl()).into(imageView);
-                            name.setText(auth.getCurrentUser().getDisplayName());
-                            mail.setText(auth.getCurrentUser().getEmail());
-                            Toast.makeText(LogInActivity.this, "Sign in successfully!", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(LogInActivity.this, MainActivity.class);
-                            intent.putExtra("USERNAME", auth.getCurrentUser().getDisplayName());
+    FirebaseAuth auth; // Firebase Authentication instance to handle user authentication
+    GoogleSignInClient googleSignInClient; // Client for managing Google Sign-In interactions
+    ShapeableImageView imageView; // Customizable ImageView for displaying user profile picture
+    TextView name, mail; // TextViews to display the user's name and email
 
-                            startActivity(intent);
-                        } else {
-                            Toast.makeText(LogInActivity.this, "Failed to sign in: " + task.getException(), Toast.LENGTH_SHORT).show();
+    // Launcher for starting the Google Sign-In intent and handling its result
+    private final ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == RESULT_OK) { // Check if the result indicates a successful operation
+                        // Get the GoogleSignInAccount object from the intent data
+                        Task<GoogleSignInAccount> accountTask = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
+                        try {
+                            // Retrieve the GoogleSignInAccount if successful
+                            GoogleSignInAccount signInAccount = accountTask.getResult(ApiException.class);
+
+                            // Create a credential using the Google ID token
+                            AuthCredential authCredential = GoogleAuthProvider.getCredential(signInAccount.getIdToken(), null);
+
+                            // Authenticate with Firebase using the credential
+                            auth.signInWithCredential(authCredential).addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) { // If Firebase sign-in succeeds
+                                    auth = FirebaseAuth.getInstance(); // Refresh the auth instance to ensure it's updated
+
+                                    // Load the user's profile picture into the ImageView using Glide
+                                    Glide.with(LogInActivity.this).load(Objects.requireNonNull(auth.getCurrentUser()).getPhotoUrl()).into(imageView);
+
+                                    // Set the user's name and email in the corresponding TextViews
+                                    name.setText(auth.getCurrentUser().getDisplayName());
+                                    mail.setText(auth.getCurrentUser().getEmail());
+
+                                    // Display a success message to the user
+                                    Toast.makeText(LogInActivity.this, "Sign in successfully!", Toast.LENGTH_SHORT).show();
+
+                                    // Start the main activity and pass the username as an extra
+                                    Intent intent = new Intent(LogInActivity.this, MainActivity.class);
+                                    intent.putExtra("USERNAME", auth.getCurrentUser().getDisplayName());
+                                    startActivity(intent);
+                                } else { // If Firebase sign-in fails
+                                    Toast.makeText(LogInActivity.this, "Failed to sign in: " + task.getException(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } catch (ApiException e) { // Handle any exceptions related to Google Sign-In
+                            e.printStackTrace();
                         }
-                    });
-                } catch (ApiException e) {
-                    e.printStackTrace();
+                    }
                 }
             }
-        }
-    });
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_log_in);
+        EdgeToEdge.enable(this); // Enable edge-to-edge display for the activity
+        setContentView(R.layout.activity_log_in); // Set the layout for this activity
 
-        FirebaseApp.initializeApp(this);
-        imageView = findViewById(R.id.profileImage);
-        name = findViewById(R.id.nameTV);
-        mail = findViewById(R.id.mailTV);
+        FirebaseApp.initializeApp(this); // Initialize Firebase SDK for the app
+        imageView = findViewById(R.id.profileImage); // Find the ImageView for displaying the profile picture
+        name = findViewById(R.id.nameTV); // Find the TextView for displaying the user's name
+        mail = findViewById(R.id.mailTV); // Find the TextView for displaying the user's email
 
-        GoogleSignInOptions options = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(getString(R.string.client_id)).requestEmail().build() ;
-        googleSignInClient = GoogleSignIn.getClient(LogInActivity.this,options);
-        auth = FirebaseAuth.getInstance() ;
-        SignInButton signInButton = findViewById(R.id.signIn) ;
+        // Configure Google Sign-In options with the client ID and email request
+        GoogleSignInOptions options = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.client_id)) // Request an ID token for authentication
+                .requestEmail() // Request access to the user's email
+                .build();
+
+        googleSignInClient = GoogleSignIn.getClient(LogInActivity.this, options); // Initialize the GoogleSignInClient
+        auth = FirebaseAuth.getInstance(); // Get the Firebase Authentication instance
+
+        SignInButton signInButton = findViewById(R.id.signIn); // Find the Google Sign-In button
         signInButton.setOnClickListener(view -> {
-            Intent intent = googleSignInClient.getSignInIntent() ;
-            activityResultLauncher.launch(intent) ;
-    });
-}}
+            // Start the Google Sign-In intent when the button is clicked
+            Intent intent = googleSignInClient.getSignInIntent();
+            activityResultLauncher.launch(intent); // Launch the intent using the ActivityResultLauncher
+        });
+    }
+}
