@@ -1,4 +1,9 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Pit Stop Frenzy</string>
     <string name="client_id">1071731306332-puvcqv9ma5jla90602ln4ec60ga9207s.apps.googleusercontent.com</string>
+    <string name="fw1">FW1</string>
+    <string name="fw2">FW2</string>
+    <string name="rw3">RW3</string>
+    <string name="rw4">RW4</string>
+    <string name="rw">RW</string>
 </resources>
