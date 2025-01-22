@@ -60,8 +60,21 @@ public class LogInActivity extends AppCompatActivity {
                                             auth.getCurrentUser().getPhotoUrl() != null ? auth.getCurrentUser().getPhotoUrl().toString() : ""
                                     );
 
-                                    // Save user info to Firebase Realtime Database
+                                    //Save user info to Firebase Realtime Database
                                     database.getReference("Users").child(userId).setValue(user);
+
+                                    /*
+                                    // Assuming userId2 is a valid user ID (maybe generated or fetched from Firebase Auth)
+                                    User user2 = new User(
+                                            Jeffoes,                // userId (this could be a new unique ID, for example, from Firebase Auth)
+                                            "Jeff",                 // userName
+                                            "Jeff@gmail.com",       // email
+                                            null                    // profileImageUrl (null because there's no image for "Jeff")
+                                    );
+
+                                    // Save the new user to Firebase
+                                    database.getReference("Users").child(userId).setValue(user2); */
+
 
                                     // Load profile data
                                     Glide.with(LogInActivity.this)
