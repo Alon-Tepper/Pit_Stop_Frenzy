@@ -5,16 +5,18 @@ public class User {
     private String userName;
     private String email;
     private String profileImageUrl;
+    private int score;
 
     // Default constructor (required for Firebase)
     public User() {
     }
 
-    public User(String userId, String userName, String email, String profileImageUrl) {
+    public User(String userId, String userName, String email, String profileImageUrl, int score) {
         this.userId = userId;
         this.userName = userName;
         this.email = email;
         this.profileImageUrl = profileImageUrl;
+        this.score = score;
     }
 
     // Getters and setters
@@ -48,5 +50,13 @@ public class User {
 
     public void setProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 }

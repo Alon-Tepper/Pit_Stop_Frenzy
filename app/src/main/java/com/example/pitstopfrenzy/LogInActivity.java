@@ -57,7 +57,8 @@ public class LogInActivity extends AppCompatActivity {
                                             userId,
                                             auth.getCurrentUser().getDisplayName(),
                                             auth.getCurrentUser().getEmail(),
-                                            auth.getCurrentUser().getPhotoUrl() != null ? auth.getCurrentUser().getPhotoUrl().toString() : ""
+                                            auth.getCurrentUser().getPhotoUrl() != null ? auth.getCurrentUser().getPhotoUrl().toString() : "",
+                                            14
                                     );
 
                                     //Save user info to Firebase Realtime Database
