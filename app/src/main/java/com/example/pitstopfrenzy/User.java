@@ -1,5 +1,7 @@
 package com.example.pitstopfrenzy;
 
+import android.util.Log;
+
 public class User {
     private String userId;
     private String userName;
@@ -58,5 +60,13 @@ public class User {
 
     public void setScore(int score) {
         this.score = score;
+    }
+
+    //sets a random score for now
+    public static int randomScore()
+    {
+        int randScore = (int) (Math.random() * 100);
+        Log.e("XXX", "randScore =  " + randScore);
+        return (int) (Math.random() * 100);
     }
 }
