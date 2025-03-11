@@ -16,9 +16,6 @@
             android:name=".Leader_BoardActivity"
             android:exported="false" />
         <activity
-            android:name=".Rear_ViewActivity"
-            android:exported="false" />
-        <activity
             android:name=".WheelGameActivity"
             android:exported="false" />
         <activity

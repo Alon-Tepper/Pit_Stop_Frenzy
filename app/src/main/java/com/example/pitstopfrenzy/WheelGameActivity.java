@@ -1,36 +1,104 @@
 package com.example.pitstopfrenzy;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-
+import android.widget.ImageView;
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class WheelGameActivity extends AppCompatActivity {
 
+    private ImageView tireImage, progressBar;
+    private int clickCounter = 0;
+
+    private final int[] tireImages = {
+            R.drawable.w_tire,
+            R.drawable.h_tire,
+            R.drawable.i_tire,
+            R.drawable.m_tire
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState); // Initializes the activity.
-        EdgeToEdge.enable(this); // Enables edge-to-edge UI for modern device screens.
-        setContentView(R.layout.activity_wheel_game); // Sets the XML layout for this activity.
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_wheel_game);
 
-        // Adjusts layout padding to avoid overlap with system bars.
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars()); // Gets system bar insets.
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom); // Applies padding dynamically.
-            return insets; // Returns the insets for processing.
+            v.setPadding(insets.getInsets(WindowInsetsCompat.Type.systemBars()).left,
+                    insets.getInsets(WindowInsetsCompat.Type.systemBars()).top,
+                    insets.getInsets(WindowInsetsCompat.Type.systemBars()).right,
+                    insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom);
+            return insets;
         });
 
-        // Configures the button to return to the main menu when clicked.
-        Button buttonM1 = findViewById(R.id.backtomainbutton1); // Finds the button in the layout.
-        buttonM1.setOnClickListener(v -> { // Sets a click listener.
-            Intent intent = new Intent(WheelGameActivity.this, MainActivity.class); // Prepares navigation to MainActivity.
-            startActivity(intent); // Starts the MainActivity.
-        });
+        tireImage = findViewById(R.id.imageview_b_tire);
+        progressBar = findViewById(R.id.imageView_progBar);
+
+        tireImage.setImageResource(tireImages[0]);
+        progressBar.setImageResource(R.drawable.progress_bar_0);
+
+        tireImage.setOnClickListener(v -> handleTireClick());
     }
+
+    private void handleTireClick() {
+        if (clickCounter < 10) {
+            clickCounter++;
+            int tireIndex = clickCounter / 2;
+            if (tireIndex >= tireImages.length) {
+                tireIndex = tireImages.length - 1;
+            }
+            tireImage.setImageResource(tireImages[tireIndex]);
+            updateProgressBar(clickCounter * 10);
+
+            if (clickCounter == 10) {
+                showFinishDialog();
+            }
+        }
+    }
+
+    private void updateProgressBar(int percent) {
+        int progressDrawable;
+        switch (percent) {
+            case 10:
+                progressDrawable = R.drawable.progress_bar_10; break;
+            case 20: case 30:
+                progressDrawable = R.drawable.progress_bar_30; break;
+            case 40:
+                progressDrawable = R.drawable.progress_bar_40; break;
+            case 50: case 60:
+                progressDrawable = R.drawable.progress_bar_60; break;
+            case 70: case 80:
+                progressDrawable = R.drawable.progress_bar_80; break;
+            case 90: case 100:
+                progressDrawable = R.drawable.progress_bar_100; break;
+            default:
+                progressDrawable = R.drawable.progress_bar_0; break;
+        }
+        progressBar.setImageResource(progressDrawable);
+    }
+
+    private void showFinishDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Finished!")
+                .setMessage("Great job! You finished the game.")
+                .setCancelable(false)
+                .setPositiveButton("Back to Main", (dialog, which) -> {
+                    SharedPreferences prefs = getSharedPreferences("game", MODE_PRIVATE);
+                    String key = getIntent().getStringExtra("buttonKey");
+                    if (key != null) {
+                        prefs.edit().putBoolean(key, true).apply();
+                    }
+                    startActivity(new Intent(WheelGameActivity.this, MainActivity.class));
+                    finish();
+                })
+                .show();
+    }
+
 }
+
+
