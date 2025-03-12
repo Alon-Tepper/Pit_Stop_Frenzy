@@ -3,7 +3,11 @@ package com.example.pitstopfrenzy;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.Button;
+import android.widget.TextView;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +18,16 @@ public class MainActivity extends AppCompatActivity {
 
     Button frontLeft, frontRight, rearLeft, rearRight, resetButton;
     SharedPreferences prefs;
+    private TextView timerTextView;
+
+    private final Handler timerHandler = new Handler(Looper.getMainLooper());
+    private final Runnable timerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            timerTextView.setText(GameTimer.getInstance().getFormattedTime());
+            timerHandler.postDelayed(this, 1000);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +51,13 @@ public class MainActivity extends AppCompatActivity {
         rearRight = findViewById(R.id.rearwheel2);
         resetButton = findViewById(R.id.resetButton);
 
+        timerTextView = findViewById(R.id.timerTextView);
+        GameTimer.getInstance().startTimer();
+        timerHandler.post(timerRunnable);
+
         resetButton.setOnClickListener(v -> {
             prefs.edit().clear().apply();
+            GameTimer.getInstance().resetTimer(); // איפוס הטיימר
             updateButtons();
         });
 
@@ -69,6 +88,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updateButtons();
+        timerHandler.post(timerRunnable); // חידוש הטיימר כשחוזרים למסך
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        timerHandler.removeCallbacks(timerRunnable); // עצירת עדכון ה-UI כשעוזבים את המסך
     }
 
     private void updateButtons() {

@@ -93,11 +93,26 @@ public class WheelGameActivity extends AppCompatActivity {
                     if (key != null) {
                         prefs.edit().putBoolean(key, true).apply();
                     }
+
+                    if (allGamesCompleted()) {
+                        GameTimer.getInstance().stopTimer(); // עצירת הטיימר כשמסיימים הכול
+                    }
+
                     startActivity(new Intent(WheelGameActivity.this, MainActivity.class));
                     finish();
                 })
                 .show();
     }
+
+    // בדיקה אם כל 4 המשחקים הושלמו
+    private boolean allGamesCompleted() {
+        SharedPreferences prefs = getSharedPreferences("game", MODE_PRIVATE);
+        return prefs.getBoolean("frontLeftDone", false) &&
+                prefs.getBoolean("frontRightDone", false) &&
+                prefs.getBoolean("rearLeftDone", false) &&
+                prefs.getBoolean("rearRightDone", false);
+    }
+
 
 }
 
