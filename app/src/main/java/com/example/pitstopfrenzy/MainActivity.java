@@ -15,6 +15,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity {
@@ -143,24 +144,32 @@ public class MainActivity extends AppCompatActivity {
         boolean rearLeftDone = prefs.getBoolean("rearLeftDone", false);
         boolean rearRightDone = prefs.getBoolean("rearRightDone", false);
 
-        if (frontLeftDone && frontRightDone && rearLeftDone && rearRightDone) {
+        // בדיקה נוספת למקרה שבו המשחק לא החל
+        boolean isGameStarted = prefs.getBoolean("isGameStarted", false);
+
+        if (isGameStarted && frontLeftDone && frontRightDone && rearLeftDone && rearRightDone) {
             GameTimer.getInstance().stopTimer();
             timerHandler.removeCallbacks(timerRunnable);
 
             int finalTime = GameTimer.getInstance().getSeconds();
             prefs.edit().putInt("finalTime", finalTime).apply();
 
-            // עדכון זמן המשחק ב-Firebase למשתמש הנוכחי
             FirebaseAuth auth = FirebaseAuth.getInstance();
-            if (auth.getCurrentUser() != null) {
+            if (auth.getCurrentUser() != null && finalTime > 0) {
                 String userId = auth.getCurrentUser().getUid();
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference userTimeRef = FirebaseDatabase.getInstance()
+                        .getReference("Users").child(userId).child("time");
 
-                // עדכון הזמן של המשתמש ישירות
-                database.getReference("Users")
-                        .child(userId)
-                        .child("time")
-                        .setValue(finalTime);
+                userTimeRef.get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Integer bestTime = task.getResult().getValue(Integer.class);
+                        if (bestTime == null || bestTime <= 0 || finalTime < bestTime) {
+                            userTimeRef.setValue(finalTime);
+                        }
+                    } else {
+                        userTimeRef.setValue(finalTime);
+                    }
+                });
             }
 
             new AlertDialog.Builder(this)
@@ -168,13 +177,20 @@ public class MainActivity extends AppCompatActivity {
                     .setMessage("You completed the game in " + GameTimer.getInstance().getFormattedTime() + "!")
                     .setCancelable(false)
                     .setPositiveButton("New Game", (dialog, which) -> {
-                        prefs.edit().clear().apply();
+                        prefs.edit()
+                                .remove("frontLeftDone")
+                                .remove("frontRightDone")
+                                .remove("rearLeftDone")
+                                .remove("rearRightDone")
+                                .putBoolean("isGameStarted", false)
+                                .apply();
+
                         GameTimer.getInstance().resetTimer();
-                        prefs.edit().putBoolean("isGameStarted", false).apply();
                         updateButtons();
                         showStartDialog();
                     })
                     .show();
         }
     }
+
 }
