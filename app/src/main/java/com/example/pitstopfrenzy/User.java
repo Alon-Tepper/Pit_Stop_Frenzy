@@ -1,24 +1,22 @@
 package com.example.pitstopfrenzy;
 
-import android.util.Log;
-
 public class User {
     private String userId;
     private String userName;
     private String email;
     private String profileImageUrl;
-    private int score;
+    private int time; // הזמן שבו המשתמש סיים את המשחק בשניות
 
     // Default constructor (required for Firebase)
     public User() {
     }
 
-    public User(String userId, String userName, String email, String profileImageUrl, int score) {
+    public User(String userId, String userName, String email, String profileImageUrl, int time) {
         this.userId = userId;
         this.userName = userName;
         this.email = email;
         this.profileImageUrl = profileImageUrl;
-        this.score = score;
+        this.time = time;
     }
 
     // Getters and setters
@@ -54,19 +52,11 @@ public class User {
         this.profileImageUrl = profileImageUrl;
     }
 
-    public int getScore() {
-        return score;
+    public int getTime() {
+        return time;
     }
 
-    public void setScore(int score) {
-        this.score = score;
-    }
-
-    //sets a random score for now
-    public static int randomScore()
-    {
-        int randScore = (int) (Math.random() * 100);
-        Log.e("XXX", "randScore =  " + randScore);
-        return (int) (Math.random() * 100);
+    public void setTime(int time) {
+        this.time = time;
     }
 }

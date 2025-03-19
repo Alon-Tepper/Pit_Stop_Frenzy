@@ -1,6 +1,7 @@
 package com.example.pitstopfrenzy;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,13 +53,17 @@ public class LogInActivity extends AppCompatActivity {
                                     FirebaseDatabase database = FirebaseDatabase.getInstance();
                                     String userId = Objects.requireNonNull(auth.getCurrentUser()).getUid();
 
+                                    SharedPreferences prefs = getSharedPreferences("game", MODE_PRIVATE);
+                                    int finalTime = prefs.getInt("finalTime", 0);
+
+
                                     // Create a custom User object
                                     User user = new User(
                                             userId,
                                             auth.getCurrentUser().getDisplayName(),
                                             auth.getCurrentUser().getEmail(),
                                             auth.getCurrentUser().getPhotoUrl() != null ? auth.getCurrentUser().getPhotoUrl().toString() : "",
-                                            User.randomScore()
+                                            finalTime // כאן אנחנו משתמשים בזמן האמיתי מהמשחק
                                     );
 
                                     //Save user info to Fasdirebase Realtime Database
