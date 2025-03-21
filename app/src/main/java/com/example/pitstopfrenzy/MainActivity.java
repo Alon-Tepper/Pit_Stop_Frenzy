@@ -64,6 +64,13 @@ public class MainActivity extends AppCompatActivity {
             showStartDialog();
         });
 
+        Button userInfoButton = findViewById(R.id.buttonUserInfo);
+        userInfoButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, User_InfoActivity.class);
+            startActivity(intent);
+        });
+
+
         updateButtons();
 
         boolean isGameStarted = prefs.getBoolean("isGameStarted", false);
@@ -192,5 +199,4 @@ public class MainActivity extends AppCompatActivity {
                     .show();
         }
     }
-
 }

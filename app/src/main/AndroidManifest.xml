@@ -13,7 +13,7 @@
         android:theme="@style/Theme.PitStopFrenzy"
         tools:targetApi="31">
         <activity
-            android:name=".Leader_BoardActivity"
+            android:name=".User_InfoActivity"
             android:exported="false" />
         <activity
             android:name=".WheelGameActivity"
