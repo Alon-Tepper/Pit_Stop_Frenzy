@@ -57,18 +57,33 @@ public class MainActivity extends AppCompatActivity {
         timerTextView = findViewById(R.id.timerTextView);
 
         resetButton.setOnClickListener(v -> {
-            prefs.edit().clear().apply();
+            int bestTime = prefs.getInt("finalTime", -1); // שליפה של הזמן הכי טוב לפני שמוחקים
+
+            prefs.edit()
+                    .remove("frontLeftDone")
+                    .remove("frontRightDone")
+                    .remove("rearLeftDone")
+                    .remove("rearRightDone")
+                    .putBoolean("isGameStarted", false)
+                    .putInt("finalTime", bestTime) // מחזירים את הזמן הכי טוב חזרה אחרי שמחקנו
+                    .apply();
+
             GameTimer.getInstance().resetTimer();
             updateButtons();
-            prefs.edit().putBoolean("isGameStarted", false).apply();
             showStartDialog();
         });
 
+
         Button userInfoButton = findViewById(R.id.buttonUserInfo);
         userInfoButton.setOnClickListener(v -> {
+            // עצירת הטיימר
+            GameTimer.getInstance().stopTimer();
+            timerHandler.removeCallbacks(timerRunnable);
+
             Intent intent = new Intent(MainActivity.this, User_InfoActivity.class);
             startActivity(intent);
         });
+
 
 
         updateButtons();
@@ -108,7 +123,10 @@ public class MainActivity extends AppCompatActivity {
                 .setMessage("Click to start the game")
                 .setCancelable(false)
                 .setPositiveButton("Start", (dialog, which) -> {
+                    int bestTime = prefs.getInt("finalTime", -1); // שליפה של הזמן הכי טוב לפני שמוחקים
+
                     prefs.edit().clear()
+                            .putInt("finalTime", bestTime) // מחזירים את הזמן הכי טוב חזרה אחרי שמחקנו
                             .putBoolean("frontLeftDone", false)
                             .putBoolean("frontRightDone", false)
                             .putBoolean("rearLeftDone", false)
@@ -125,12 +143,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
     @Override
     protected void onResume() {
         super.onResume();
         updateButtons();
         checkIfGameFinished();
+
+        // הפעל את הטיימר מחדש רק אם המשחק התחיל בעבר ועדיין לא הסתיים
+        boolean isGameStarted = prefs.getBoolean("isGameStarted", false);
+        boolean gameFinished = prefs.getBoolean("frontLeftDone", false)
+                && prefs.getBoolean("frontRightDone", false)
+                && prefs.getBoolean("rearLeftDone", false)
+                && prefs.getBoolean("rearRightDone", false);
+
+        if (isGameStarted && !gameFinished) {
+            GameTimer.getInstance().startTimer();
+            timerHandler.post(timerRunnable);
+        }
     }
+
 
     @Override
     protected void onPause() {
