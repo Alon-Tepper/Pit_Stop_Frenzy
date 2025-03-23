@@ -5,28 +5,49 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#89D08C">
+    android:background="#89D08C"
+    tools:context=".MainActivity">
 
+    <!-- טיימר למעלה -->
+    <TextView
+        android:id="@+id/timerTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="00:00"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <!-- תמונת רכב -->
     <ImageView
         android:id="@+id/f1Car"
-        android:layout_width="238dp"
-        android:layout_height="491dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:contentDescription="F1 Car"
         android:scaleType="fitCenter"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintDimensionRatio="H,16:9"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/f1_car"
+        app:layout_constraintTop_toBottomOf="@id/timerTextView"
+        app:layout_constraintBottom_toTopOf="@id/resetButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.35"
-        app:layout_constraintWidth_percent="0.7"
-        app:srcCompat="@drawable/f1_car" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintDimensionRatio="2:3" />
 
+    <!-- גלגל קדמי שמאל -->
+
+    <!-- גלגל קדמי ימין -->
+
+    <!-- גלגל אחורי שמאל -->
+
+    <!-- גלגל אחורי ימין -->
     <Button
         android:id="@+id/frontwheel1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="184dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginBottom="204dp"
         android:text="@string/fw1"
         app:layout_constraintBottom_toBottomOf="@id/f1Car"
         app:layout_constraintStart_toStartOf="@id/f1Car" />
@@ -35,7 +56,8 @@
         android:id="@+id/frontwheel2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="184dp"
+        android:layout_marginEnd="44dp"
+        android:layout_marginBottom="204dp"
         android:text="@string/fw2"
         app:layout_constraintBottom_toBottomOf="@id/f1Car"
         app:layout_constraintEnd_toEndOf="@id/f1Car" />
@@ -44,16 +66,19 @@
         android:id="@+id/rearwheel1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="168dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="176dp"
         android:text="RW1"
         app:layout_constraintStart_toStartOf="@id/f1Car"
         app:layout_constraintTop_toTopOf="@id/f1Car" />
 
+    <!-- כפתור RESET -->
     <Button
         android:id="@+id/rearwheel2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="168dp"
+        android:layout_marginEnd="44dp"
         android:text="RW2"
         app:layout_constraintEnd_toEndOf="@id/f1Car"
         app:layout_constraintTop_toTopOf="@id/f1Car" />
@@ -64,33 +89,19 @@
         android:layout_height="wrap_content"
         android:text="RESET"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="24dp" />
 
-    <TextView
-        android:id="@+id/timerTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="00:00"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="16dp"/>
-
+    <!-- כפתור User Info -->
     <Button
         android:id="@+id/buttonUserInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="User Info"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.05"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.023" />
-
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
