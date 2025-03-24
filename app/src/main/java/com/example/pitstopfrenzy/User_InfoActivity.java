@@ -14,45 +14,52 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class User_InfoActivity extends AppCompatActivity {
-    private ShapeableImageView profileImage;
-    private TextView userName, userEmail, userBestTime;
+
+    private ShapeableImageView profileImage; // Image view for user profile picture
+    private TextView userName, userEmail, userBestTime; // UI elements to display user info
     private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_info);
+        setContentView(R.layout.activity_user_info); // Set the layout for this screen
 
+        // Link UI elements
         profileImage = findViewById(R.id.profile_image);
         userName = findViewById(R.id.user_name);
         userEmail = findViewById(R.id.user_email);
         userBestTime = findViewById(R.id.user_best_time);
 
-        loadUserData();
+        loadUserData(); // Load and display user data from Firebase
 
+        // Handle back button to return to main activity
         Button backButton = findViewById(R.id.buttonBackToMain);
         backButton.setOnClickListener(v -> {
             Intent intent = new Intent(User_InfoActivity.this, MainActivity.class);
             startActivity(intent);
         });
-
     }
 
+    // Load user info from Firebase Realtime Database
     private void loadUserData() {
         FirebaseAuth auth = FirebaseAuth.getInstance();
 
-        if(auth.getCurrentUser() == null) return; // הגנה חשובה אם אין משתמש מחובר
+        // Protect against null user
+        if(auth.getCurrentUser() == null) return;
 
         String userId = auth.getCurrentUser().getUid();
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users").child(userId);
 
+        // Fetch user data from Firebase
         userRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult().exists()) {
                 User user = task.getResult().getValue(User.class);
                 if (user != null) {
+                    // Display user name and email, or default if missing
                     userName.setText(user.getUserName() != null ? user.getUserName() : "No Name");
                     userEmail.setText(user.getEmail() != null ? user.getEmail() : "No Email");
 
+                    // Format and display best time if available
                     if (user.getTime() > 0) {
                         int minutes = user.getTime() / 60;
                         int seconds = user.getTime() % 60;
@@ -61,21 +68,21 @@ public class User_InfoActivity extends AppCompatActivity {
                         userBestTime.setText("Best Time: N/A");
                     }
 
-                    // בדיקת תקינות URL התמונה
+                    // Load profile image from URL using Glide
                     if (user.getProfileImageUrl() != null && !user.getProfileImageUrl().isEmpty()) {
                         Glide.with(this)
                                 .load(user.getProfileImageUrl())
-                                .circleCrop()
+                                .circleCrop() // Make it circular
                                 .into(profileImage);
                     } else {
-                        // אם אין תמונה, הצג תמונת ברירת מחדל
+                        // Show default image if no profile picture
                         profileImage.setImageResource(R.drawable.h_tire);
                     }
                 }
             } else {
+                // Show error toast if data could not be loaded
                 Toast.makeText(this, "Unable to load user data.", Toast.LENGTH_SHORT).show();
             }
         });
     }
-
 }
