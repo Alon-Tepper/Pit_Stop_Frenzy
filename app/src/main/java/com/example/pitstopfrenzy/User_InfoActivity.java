@@ -25,7 +25,7 @@ public class User_InfoActivity extends AppCompatActivity {
     private TextView userName, userEmail, userBestTime;
     private User user;
 
-    // Light sensor components
+    // Light sensor component
     private SensorManager sensorManager;
     private Sensor lightSensor;
     private SensorEventListener lightSensorListener;
