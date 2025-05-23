@@ -35,7 +35,7 @@ public class User_InfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_info);
 
-        // Link UI elements
+        // Link UI element
         profileImage = findViewById(R.id.profile_image);
         userName = findViewById(R.id.user_name);
         userEmail = findViewById(R.id.user_email);
