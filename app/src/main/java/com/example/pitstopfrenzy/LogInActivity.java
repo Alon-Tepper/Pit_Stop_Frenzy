@@ -2,7 +2,13 @@ package com.example.pitstopfrenzy;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,36 +37,35 @@ import com.google.android.material.imageview.ShapeableImageView;
 import java.util.Objects;
 
 public class LogInActivity extends AppCompatActivity {
-    FirebaseAuth auth; // Firebase authentication instance
-    GoogleSignInClient googleSignInClient; // Google sign-in client
-    ShapeableImageView imageView; // Profile image view
-    TextView name, mail; // TextViews for displaying name and email
+    FirebaseAuth auth;
+    GoogleSignInClient googleSignInClient;
+    ShapeableImageView imageView;
+    TextView name, mail;
 
-    // Launcher for Google Sign-In result
+    private SensorManager sensorManager;
+    private Sensor lightSensor;
+    private SensorEventListener lightSensorListener;
+
     private final ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
                 @Override
                 public void onActivityResult(ActivityResult result) {
                     if (result.getResultCode() == RESULT_OK) {
-                        // Get sign-in account from result
                         Task<GoogleSignInAccount> accountTask = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
                         try {
                             GoogleSignInAccount signInAccount = accountTask.getResult(ApiException.class);
                             AuthCredential authCredential = GoogleAuthProvider.getCredential(signInAccount.getIdToken(), null);
 
-                            // Sign in to Firebase with Google credentials
                             auth.signInWithCredential(authCredential).addOnCompleteListener(task -> {
                                 if (task.isSuccessful()) {
                                     auth = FirebaseAuth.getInstance();
                                     FirebaseDatabase database = FirebaseDatabase.getInstance();
                                     String userId = Objects.requireNonNull(auth.getCurrentUser()).getUid();
 
-                                    // Load game time from SharedPreferences
                                     SharedPreferences prefs = getSharedPreferences("game", MODE_PRIVATE);
                                     int finalTime = prefs.getInt("finalTime", 0);
 
-                                    // Create a custom User object
                                     User user = new User(
                                             userId,
                                             auth.getCurrentUser().getDisplayName(),
@@ -69,21 +74,17 @@ public class LogInActivity extends AppCompatActivity {
                                             finalTime
                                     );
 
-                                    // Save user data to Firebase Realtime Database
                                     database.getReference("Users").child(userId).setValue(user);
 
-                                    // Load profile picture using Glide
                                     Glide.with(LogInActivity.this)
                                             .load(Objects.requireNonNull(auth.getCurrentUser()).getPhotoUrl())
                                             .into(imageView);
 
-                                    // Display user name and email
                                     name.setText(auth.getCurrentUser().getDisplayName());
                                     mail.setText(auth.getCurrentUser().getEmail());
 
                                     Toast.makeText(LogInActivity.this, "Sign in successful!", Toast.LENGTH_SHORT).show();
 
-                                    // Go to MainActivity
                                     Intent intent = new Intent(LogInActivity.this, MainActivity.class);
                                     intent.putExtra("USERNAME", auth.getCurrentUser().getDisplayName());
                                     startActivity(intent);
@@ -92,7 +93,7 @@ public class LogInActivity extends AppCompatActivity {
                                 }
                             });
                         } catch (ApiException e) {
-                            e.printStackTrace();
+                            Log.e("LOGIN_ERROR", "Google sign-in failed", e);
                         }
                     }
                 }
@@ -102,30 +103,63 @@ public class LogInActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this); // Enable full screen layout
-        setContentView(R.layout.activity_log_in); // Set the layout
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_log_in);
 
-        FirebaseApp.initializeApp(this); // Initialize Firebase
+        FirebaseApp.initializeApp(this);
 
-        // Link UI elements
         imageView = findViewById(R.id.profileImage);
         name = findViewById(R.id.nameTV);
         mail = findViewById(R.id.mailTV);
 
-        // Configure Google Sign-In options
         GoogleSignInOptions options = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.client_id)) // Request ID token
-                .requestEmail() // Request user email
+                .requestIdToken(getString(R.string.client_id))
+                .requestEmail()
                 .build();
 
-        googleSignInClient = GoogleSignIn.getClient(LogInActivity.this, options); // Create client
-        auth = FirebaseAuth.getInstance(); // Get FirebaseAuth instance
+        googleSignInClient = GoogleSignIn.getClient(LogInActivity.this, options);
+        auth = FirebaseAuth.getInstance();
 
-        // Handle sign-in button click
         SignInButton signInButton = findViewById(R.id.signIn);
         signInButton.setOnClickListener(view -> {
-            Intent intent = googleSignInClient.getSignInIntent(); // Launch Google sign-in
-            activityResultLauncher.launch(intent); // Handle result
+            Intent intent = googleSignInClient.getSignInIntent();
+            activityResultLauncher.launch(intent);
         });
+
+        // SENSOR SETUP - Light sensor for screen brightness
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+
+        lightSensorListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                float lightLevel = event.values[0];
+                Log.d("LIGHT_SENSOR", "Light level: " + lightLevel);
+
+                float brightness = lightLevel / 1000f;
+                brightness = Math.max(0.05f, Math.min(brightness, 1f));
+
+                WindowManager.LayoutParams layout = getWindow().getAttributes();
+                layout.screenBrightness = brightness;
+                getWindow().setAttributes(layout);
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+                // Not used
+            }
+        };
+
+        if (lightSensor != null) {
+            sensorManager.registerListener(lightSensorListener, lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (sensorManager != null && lightSensorListener != null) {
+            sensorManager.unregisterListener(lightSensorListener);
+        }
     }
 }

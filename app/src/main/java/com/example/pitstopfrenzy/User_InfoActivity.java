@@ -1,7 +1,13 @@
 package com.example.pitstopfrenzy;
 
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,14 +21,19 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class User_InfoActivity extends AppCompatActivity {
 
-    private ShapeableImageView profileImage; // Image view for user profile picture
-    private TextView userName, userEmail, userBestTime; // UI elements to display user info
+    private ShapeableImageView profileImage;
+    private TextView userName, userEmail, userBestTime;
     private User user;
+
+    // Light sensor components
+    private SensorManager sensorManager;
+    private Sensor lightSensor;
+    private SensorEventListener lightSensorListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_info); // Set the layout for this screen
+        setContentView(R.layout.activity_user_info);
 
         // Link UI elements
         profileImage = findViewById(R.id.profile_image);
@@ -38,28 +49,59 @@ public class User_InfoActivity extends AppCompatActivity {
             Intent intent = new Intent(User_InfoActivity.this, MainActivity.class);
             startActivity(intent);
         });
+
+        // Sensor setup - Light sensor for screen brightness
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+
+        lightSensorListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(android.hardware.SensorEvent event) {
+                float lightLevel = event.values[0];
+                Log.d("LIGHT_SENSOR", "Light level: " + lightLevel);
+
+                float brightness = lightLevel / 1000f;
+                brightness = Math.max(0.05f, Math.min(brightness, 1f));
+
+                WindowManager.LayoutParams layout = getWindow().getAttributes();
+                layout.screenBrightness = brightness;
+                getWindow().setAttributes(layout);
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+                // Not used
+            }
+        };
+
+        if (lightSensor != null) {
+            sensorManager.registerListener(lightSensorListener, lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (sensorManager != null && lightSensorListener != null) {
+            sensorManager.unregisterListener(lightSensorListener);
+        }
     }
 
     // Load user info from Firebase Realtime Database
     private void loadUserData() {
         FirebaseAuth auth = FirebaseAuth.getInstance();
-
-        // Protect against null user
-        if(auth.getCurrentUser() == null) return;
+        if (auth.getCurrentUser() == null) return;
 
         String userId = auth.getCurrentUser().getUid();
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users").child(userId);
 
-        // Fetch user data from Firebase
         userRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult().exists()) {
                 User user = task.getResult().getValue(User.class);
                 if (user != null) {
-                    // Display user name and email, or default if missing
                     userName.setText(user.getUserName() != null ? user.getUserName() : "No Name");
                     userEmail.setText(user.getEmail() != null ? user.getEmail() : "No Email");
 
-                    // Format and display best time if available
                     if (user.getTime() > 0) {
                         int minutes = user.getTime() / 60;
                         int seconds = user.getTime() % 60;
@@ -68,19 +110,16 @@ public class User_InfoActivity extends AppCompatActivity {
                         userBestTime.setText("Best Time: N/A");
                     }
 
-                    // Load profile image from URL using Glide
                     if (user.getProfileImageUrl() != null && !user.getProfileImageUrl().isEmpty()) {
                         Glide.with(this)
                                 .load(user.getProfileImageUrl())
-                                .circleCrop() // Make it circular
+                                .circleCrop()
                                 .into(profileImage);
                     } else {
-                        // Show default image if no profile picture
                         profileImage.setImageResource(R.drawable.h_tire);
                     }
                 }
             } else {
-                // Show error toast if data could not be loaded
                 Toast.makeText(this, "Unable to load user data.", Toast.LENGTH_SHORT).show();
             }
         });

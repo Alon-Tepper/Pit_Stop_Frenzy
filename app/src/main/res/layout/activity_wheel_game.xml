@@ -1,55 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/pitstop_background_rotated"
     tools:context=".WheelGameActivity">
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Press!"
+        android:text="Catch the wheel!"
         android:textAlignment="center"
         android:textSize="32sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/imageview_b_tire"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textColor="#FFA500"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.15"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/gameContainer"
+        app:layout_constraintVertical_bias="0.1"
         tools:ignore="HardcodedText" />
 
-    <ImageView
-        android:id="@+id/imageview_b_tire"
+
+    <!-- FrameLayout container for free movement -->
+    <FrameLayout
+        android:id="@+id/gameContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:contentDescription="Tire Image"
-        android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintWidth_percent="0.5"
+        android:clipChildren="false"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
         app:layout_constraintBottom_toTopOf="@+id/imageView_progBar"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView"
-        app:layout_constraintVertical_bias="0.4"
-        app:srcCompat="@drawable/w_tire" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/imageview_b_tire"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="top|start"
+            android:src="@drawable/w_tire"
+            android:contentDescription="Tire Image" />
+    </FrameLayout>
 
     <ImageView
         android:id="@+id/imageView_progBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:contentDescription="Progress Bar"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
+        android:contentDescription="Progress Bar"
         app:layout_constraintWidth_percent="0.7"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintVertical_bias="0.85"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.9"
         app:srcCompat="@drawable/progress_bar_0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

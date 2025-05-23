@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#89D08C"
+    android:background="@drawable/monaco_darkened"
     tools:context=".MainActivity">
 
     <!-- טיימר למעלה -->
@@ -14,7 +14,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="00:00"
-        android:textSize="24sp"
+        android:textSize="26sp"
+        android:textColor="#FFFFFF"
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,58 +37,57 @@
         app:layout_constraintDimensionRatio="2:3" />
 
     <!-- גלגל קדמי שמאל -->
-
-    <!-- גלגל קדמי ימין -->
-
-    <!-- גלגל אחורי שמאל -->
-
-    <!-- גלגל אחורי ימין -->
     <Button
         android:id="@+id/frontwheel1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="44dp"
         android:layout_marginBottom="204dp"
-        android:text="@string/fw1"
+        android:text="Front Left"
         app:layout_constraintBottom_toBottomOf="@id/f1Car"
         app:layout_constraintStart_toStartOf="@id/f1Car" />
 
+    <!-- גלגל קדמי ימין -->
     <Button
         android:id="@+id/frontwheel2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="44dp"
         android:layout_marginBottom="204dp"
-        android:text="@string/fw2"
+        android:text="Front Right"
         app:layout_constraintBottom_toBottomOf="@id/f1Car"
         app:layout_constraintEnd_toEndOf="@id/f1Car" />
 
+    <!-- גלגל אחורי שמאל -->
     <Button
         android:id="@+id/rearwheel1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="44dp"
         android:layout_marginTop="176dp"
-        android:text="RW1"
+        android:text="Rear Left"
         app:layout_constraintStart_toStartOf="@id/f1Car"
         app:layout_constraintTop_toTopOf="@id/f1Car" />
 
-    <!-- כפתור RESET -->
+    <!-- גלגל אחורי ימין -->
     <Button
         android:id="@+id/rearwheel2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="168dp"
         android:layout_marginEnd="44dp"
-        android:text="RW2"
+        android:text="Rear Right"
         app:layout_constraintEnd_toEndOf="@id/f1Car"
         app:layout_constraintTop_toTopOf="@id/f1Car" />
 
+    <!-- כפתור RESET -->
     <Button
         android:id="@+id/resetButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="RESET"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

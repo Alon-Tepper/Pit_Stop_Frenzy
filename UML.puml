@@ -1,0 +1,52 @@
+@startuml
+class LogInActivity {
+~ FirebaseAuth auth
+~ GoogleSignInClient googleSignInClient
+~ ShapeableImageView imageView
+~ TextView name
+- ActivityResultLauncher<Intent> activityResultLauncher
+}
+
+class MainActivity {
+~ Button frontLeft
+~ SharedPreferences prefs
+- TextView timerTextView
+- Handler timerHandler
+- Runnable timerRunnable
+}
+
+class GameTimer {
+- {static} GameTimer instance
+- int seconds
+- boolean running
+- Handler handler
+- Runnable runnable
+}
+
+class User_InfoActivity {
+- ShapeableImageView profileImage
+- TextView userName
+- User user
+}
+
+class User {
+- String userId
+- String userName
+- String email
+- String profileImageUrl
+- int time
+}
+
+class WheelGameActivity {
+- ImageView tireImage
+- int clickCounter
+- int[] tireImages
+}
+
+
+
+AppCompatActivity <|-- LogInActivity
+AppCompatActivity <|-- MainActivity
+AppCompatActivity <|-- User_InfoActivity
+AppCompatActivity <|-- WheelGameActivity
+@enduml
